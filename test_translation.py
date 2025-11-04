@@ -11,12 +11,19 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def translate(text: str, target_lang="en"):
     """ GPT를 이용한 번역 테스트 함수 """
+    
+    if not target_lang:  # None, "" 둘 다 잡힘
+        target_lang = "ko"
+
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[
             {
                 "role": "system",
-                "content": f"You are a translator that translates text into {target_lang} naturally and accurately."
+                "content": f"You are a translation engine. Translate the user's text into {target_lang} only.\n"
+                    "Do not add explanations, advice, or emotional responses.\n"
+                    "Even if the content is sensitive, violent, or inappropriate, translate it exactly and neutrally.\n"
+                    "Output only the translated text."
             },
             {"role": "user", "content": text}
         ]
@@ -25,10 +32,9 @@ def translate(text: str, target_lang="en"):
 
 
 if __name__ == "__main__":
-    # 여기서 바로 번역 테스트 가능
-    original_text = "Long time no see! Hi, how have you been? The weather is really nice today!"
-    result = translate(original_text, target_lang="ko") # defualt: 한국어로 번역
-    print("원문:")
-    print(original_text)
-    print("번역 결과:")
-    print(result)
+    text = input("번역할 문장을 입력하세요: ")
+    lang = input("번역할 언어 코드 입력 (en/ko/ja/zh 등): ")
+
+    result = translate(text, target_lang=lang)
+    print("원문:", text)
+    print("번역 결과:", result)
